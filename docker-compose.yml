@@ -1,0 +1,12 @@
+services:
+  php-fpm:
+    build: docker/php-fpm
+    volumes:
+      - ./:/var/www/html
+
+  apache:
+    build: docker/apache
+    ports:
+      - "8000:80"
+    volumes:
+      - ./public:/var/www/html/public
