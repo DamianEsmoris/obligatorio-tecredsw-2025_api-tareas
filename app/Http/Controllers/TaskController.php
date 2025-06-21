@@ -11,8 +11,10 @@ class TaskController extends Controller
     private function validateData(Array $data) {
         $validation = Validator::make($data, [
             'title' => 'required',
-            'description' => 'required',
-            'status' => 'required',
+            'description' => '',
+            'author_id' => 'required|integer',
+            'start_date' => 'datetime',
+            'due_date' => 'datetime',
         ]);
         $validationFailed = $validation->fails();
         return [$validationFailed, $validationFailed ? $validation->errors() : null];
@@ -26,7 +28,9 @@ class TaskController extends Controller
         $task = new Task();
         $task->title = $request->post('title');
         $task->description = $request->post('description');
-        $task->status = $request->post('status');
+        $task->author_id = $request->post('author_id');
+        $task->start_date = $request->post('start_date');
+        $task->due_date = $request->post('due_date');
         $task->save();
 
         return $task;
@@ -49,7 +53,9 @@ class TaskController extends Controller
 
         $task->title = $request->post('title');
         $task->description = $request->post('description');
-        $task->status = $request->post('status');
+        $task->author_id = $request->post('author_id');
+        $task->start_date = $request->post('start_date');
+        $task->due_date = $request->post('due_date');
         $task->save();
 
         return $task;

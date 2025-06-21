@@ -21,7 +21,7 @@ class TaskTest extends TestCase
             'id',
             'title',
             'description',
-            'status',
+            'author_id',
             'created_at',
             'updated_at'
         ];
@@ -32,7 +32,7 @@ class TaskTest extends TestCase
         return [
             'title' => '.',
             'description' => '.',
-            'status' => 'Todo',
+            'author_id' => '1',
         ];
     }
 

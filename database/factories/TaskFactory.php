@@ -8,10 +8,13 @@ class TaskFactory extends Factory
 {
     public function definition(): array
     {
+        $startDate = fake()->dateTime();
         return [
-            'title' => fake()->name(),
-            'description' => fake()->word(),
-            'status' => fake()->word(),
+            'title' => fake()->sentence(),
+            'description' => fake()->text(),
+            'author_id' => fake()->randomDigit(),
+            'start_date' => $startDate,
+            'due_date' => fake()->dateTimeBetween($startDate, '+30 years'),
         ];
     }
 }
