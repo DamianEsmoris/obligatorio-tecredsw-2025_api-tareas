@@ -37,11 +37,11 @@ class TaskController extends Controller
     }
 
     public function GetAll(Request $request) {
-        return Task::get();
+        return Task::with('categories')->get();
     }
 
     public function Get(Request $request, int $id) {
-        return Task::findOrFail($id);
+        return Task::with("categories")->findOrFail($id);
     }
 
     public function Modify(Request $request, int $id) {

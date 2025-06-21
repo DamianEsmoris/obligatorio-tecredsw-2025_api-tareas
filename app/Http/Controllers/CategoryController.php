@@ -29,11 +29,11 @@ class CategoryController extends Controller
     }
 
     public function GetAll(Request $request) {
-        return Category::get();
+        return Category::with("assignedTo")->get();
     }
 
     public function Get(Request $request, int $id) {
-        return Category::findOrFail($id);
+        return Category::with("assignedTo")->findOrFail($id);
     }
 
     public function Modify(Request $request, int $id) {
