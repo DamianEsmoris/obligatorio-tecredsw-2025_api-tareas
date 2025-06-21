@@ -3,6 +3,6 @@
 composer install
 php artisan key:generate
 php artisan migrate:fresh
+php artisan db:seed
 
-/opt/remi/php82/root/usr/sbin/php-fpm -F -y /etc/php82-fpm.conf
-php artisan serve
+php-fpm -F -y /etc/php-fpm.conf

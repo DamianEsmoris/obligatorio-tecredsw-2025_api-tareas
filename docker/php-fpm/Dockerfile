@@ -1,15 +1,22 @@
 FROM rockylinux:9
 
 RUN dnf update -y \
+    && dnf install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-9.noarch.rpm \
     && dnf install -y https://rpms.remirepo.net/enterprise/remi-release-9.rpm
 
-RUN dnf module enable -y php:remi-8.2
+RUN curl -sSL -O https://packages.microsoft.com/config/rhel/9/packages-microsoft-prod.rpm \
+    && dnf install -y packages-microsoft-prod.rpm \
+    && rm packages-microsoft-prod.rpm
 
-RUN dnf install -y php82 php82-php-fpm php82-php-cli \
+ENV ACCEPT_EULA=Y
+
+RUN dnf install -y yum-utils \
+    && dnf module -y reset php \
+    && dnf module -y install php:remi-8.2
+
+RUN dnf install -y git unzip php php-fpm php-cli php-pear php-devel php-sqlsrv msodbcsql18 \
     && dnf clean all \
-    && rm -rf /var/cache/dnf
-
-ENV PATH="/opt/remi/php82/root/usr/bin:${PATH}"
+    && rm -rf /var/cache/dnf || true
 
 RUN curl https://getcomposer.org/installer -o composer-installer.php \
     && php composer-installer.php --filename=composer --install-dir=/usr/local/bin \
@@ -25,7 +32,7 @@ log_buffering = no
 daemonize = no
 EOF
 
-RUN mkdir -p /etc/php-fpm.d/
+RUN mkdir -p /etc/php-fpm.d/ /run/php-fpm/
 
 RUN cat <<EOF > /etc/php-fpm.d/www.conf
 [www]
