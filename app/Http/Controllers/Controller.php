@@ -2,65 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Category;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
-
 abstract class Controller
 {
-    private function validateData(Array $data) {
-        $validation = Validator::make($data, [
-            'name' => 'required|text|unique',
-        ]);
-        $validationFailed = $validation->fails();
-        return [$validationFailed, $validationFailed ? $validation->errors() : null];
-    }
-
-    public function Create(Request $request) {
-        [$validationFailed, $validationErrors] = $this->validateData($request->all());
-        if ($validationFailed)
-            return response($validationErrors, 401);
-
-        $task = new Category();
-        $task->title = $request->post('title');
-        $task->description = $request->post('description');
-        $task->author_id = $request->post('author_id');
-        $task->start_date = $request->post('start_date');
-        $task->due_date = $request->post('due_date');
-        $task->save();
-
-        return $task;
-    }
-
-    public function GetAll(Request $request) {
-        return Task::get();
-    }
-
-    public function Get(Request $request, int $id) {
-        return Task::findOrFail($id);
-    }
-
-    public function Modify(Request $request, int $id) {
-        $task = Task::findOrFail($id);
-
-        [$validationFailed, $validationErrors] = $this->validateData($request->all());
-        if ($validationFailed)
-            return response($validationErrors, 401);
-
-        $task->title = $request->post('title');
-        $task->description = $request->post('description');
-        $task->author_id = $request->post('author_id');
-        $task->start_date = $request->post('start_date');
-        $task->due_date = $request->post('due_date');
-        $task->save();
-
-        return $task;
-    }
-
-    public function Delete(Request $request, int $id) {
-        Task::findOrFail($id)->delete();
-        return response()->json([
-            'deleted' => true
-        ]);
-    }
+    //
 }
