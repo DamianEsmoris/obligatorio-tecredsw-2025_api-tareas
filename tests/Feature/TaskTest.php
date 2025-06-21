@@ -32,7 +32,6 @@ class TaskTest extends TestCase
         return [
             'title' => '.',
             'description' => '.',
-            'date_time' => '2025-11-28 12:00:00',
             'status' => 'Todo',
         ];
     }
@@ -64,6 +63,10 @@ class TaskTest extends TestCase
         $response = $this->post('/api/task', $this->getExampleTask());
         $response->assertStatus(201);
         $response->assertJsonStructure($this->getBasicTaskStructure());
+        $data = $response->json();
+        $this->assertDatabaseHas('tasks', [
+            'id' => $data['id']
+        ]);
     }
 
     public function test_updateExistentTask(): void
@@ -71,23 +74,40 @@ class TaskTest extends TestCase
         $response = $this->put('/api/task/1', $this->getExampleTask());
         $response->assertStatus(200);
         $response->assertJsonStructure($this->getBasicTaskStructure());
+        $data = $response->json();
+        $this->assertDatabaseHas('tasks', [
+            ...$this->getExampleTask(),
+            'id' => $data['id']
+        ]);
     }
 
     public function test_updateNoneExistentTask(): void
     {
         $response = $this->put('/api/task/999', $this->getExampleTask());
         $response->assertStatus(404);
+        $this->assertDatabaseMissing('tasks', [
+            'id' => 999,
+            'deleted_at' => null
+        ]);
     }
 
     public function test_deleteExistentTask(): void
     {
-        $response = $this->delete('/api/task/1');
+        $response = $this->delete('/api/task/2');
         $response->assertStatus(200);
+        $this->assertDatabaseMissing('tasks', [
+            'id' => 2,
+            'deleted_at' => null
+        ]);
     }
 
     public function test_deleteNoneExistentTask(): void
     {
         $response = $this->delete('/api/task/999');
         $response->assertStatus(404);
+        $this->assertDatabaseMissing('tasks', [
+            'id' => 999,
+            'deleted_at' => null
+        ]);
     }
 }
