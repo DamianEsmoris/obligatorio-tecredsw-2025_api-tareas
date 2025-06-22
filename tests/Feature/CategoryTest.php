@@ -19,7 +19,16 @@ class CategoryTest extends TestCase
     {
         return [
             'id',
-            'name'
+            'name',
+        ];
+    }
+
+    private function getCategoryStructureWithTasks() : Array
+    {
+        return [
+            'id',
+            'name',
+            'assigned_to'
         ];
     }
 
@@ -30,12 +39,12 @@ class CategoryTest extends TestCase
         ];
     }
 
-    public function test_getAllCategorys(): void
+    public function test_getAllCategories(): void
     {
         $response = $this->get('/api/category');
         $response->assertStatus(200);
         $response->assertJsonStructure([
-            '*' => $this->getBasicCategoryStructure()
+            '*' => $this->getCategoryStructureWithTasks()
         ]);
     }
 
@@ -43,7 +52,7 @@ class CategoryTest extends TestCase
     {
         $response = $this->get('/api/category/1');
         $response->assertStatus(200);
-        $response->assertJsonStructure($this->getBasicCategoryStructure());
+        $response->assertJsonStructure($this->getCategoryStructureWithTasks());
     }
 
     public function test_getNoneExistentCategory(): void
