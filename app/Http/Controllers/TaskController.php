@@ -62,7 +62,9 @@ class TaskController extends Controller
     }
 
     public function Delete(Request $request, int $id) {
-        Task::findOrFail($id)->delete();
+        $task = Task::findOrFail($id);
+        $task->categories()->detach();
+        $task->delete();
         return response()->json([
             'deleted' => true
         ]);
