@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Category;
+use App\Models\Comment;
 use App\Models\HasAssigned;
 use App\Models\Task;
 
@@ -16,6 +17,6 @@ class DatabaseSeeder extends Seeder
         Task::factory(20)->create();
         for ($i = 0; $i < 25; $i++)
             HasAssigned::factory()->create();
-
+        Comment::factory(40)->create();
     }
 }
