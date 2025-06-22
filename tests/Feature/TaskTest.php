@@ -50,7 +50,9 @@ class TaskTest extends TestCase
     {
         $response = $this->get('/api/task/1');
         $response->assertStatus(200);
-        $response->assertJsonStructure($this->getTaskStructureWithCategories());
+        $taskResponseStructure = $this->getTaskStructureWithCategories();
+        array_push($taskResponseStructure, 'comments');
+        $response->assertJsonStructure($taskResponseStructure);
     }
 
     public function test_getNoneExistentTask(): void

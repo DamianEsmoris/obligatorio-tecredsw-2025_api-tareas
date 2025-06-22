@@ -46,7 +46,7 @@ class TaskController extends Controller
     }
 
     public function Get(Request $request, int $id) {
-        return Task::with('categories')->findOrFail($id);
+        return Task::with('comments')->with('categories')->findOrFail($id);
     }
 
     public function Modify(Request $request, int $id) {
