@@ -15,6 +15,8 @@ class TaskController extends Controller
             'author_id' => 'required|integer',
             'start_date' => 'datetime',
             'due_date' => 'datetime',
+            'categories' => 'nullable|array',
+            'categories.*' => 'integer|exists:categories,id'
         ]);
         $validationFailed = $validation->fails();
         return [$validationFailed, $validationFailed ? $validation->errors() : null];
@@ -33,7 +35,10 @@ class TaskController extends Controller
         $task->due_date = $request->post('due_date');
         $task->save();
 
-        return $task;
+        if (($categories = $request->post('categories') != null))
+            $task->categories()->sync($categories);
+
+        return $task->load('categories');
     }
 
     public function GetAll(Request $request) {
@@ -41,7 +46,7 @@ class TaskController extends Controller
     }
 
     public function Get(Request $request, int $id) {
-        return Task::with("categories")->findOrFail($id);
+        return Task::with('categories')->findOrFail($id);
     }
 
     public function Modify(Request $request, int $id) {
@@ -58,7 +63,10 @@ class TaskController extends Controller
         $task->due_date = $request->post('due_date');
         $task->save();
 
-        return $task;
+        if (($categories = $request->post('categories') != null))
+            $task->categories()->sync($categories);
+
+        return $task->load('categories');
     }
 
     public function Delete(Request $request, int $id) {
