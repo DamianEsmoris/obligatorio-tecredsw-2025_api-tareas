@@ -12,9 +12,17 @@ class TaskController extends Controller
         $validation = Validator::make($data, [
             'title' => 'required',
             'description' => '',
+<<<<<<< Updated upstream
             'author_id' => 'required|integer',
             'start_date' => 'datetime',
             'due_date' => 'datetime',
+=======
+            'author_id' => 'required|integer|exists:users,id',
+            'start_date' => 'date_format:Y-m-d H:i:s',
+            'due_date' => 'date_format:Y-m-d H:i:s',
+            'categories' => 'nullable|array',
+            'categories.*' => 'integer|exists:categories,id'
+>>>>>>> Stashed changes
         ]);
         $validationFailed = $validation->fails();
         return [$validationFailed, $validationFailed ? $validation->errors() : null];
