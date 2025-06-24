@@ -8,9 +8,11 @@ class CommentFactory extends Factory
 {
     public function definition(): array
     {
+        $taskId = fake()->randomNumber(1,20);
+        $authorId = fake()->randomNumber(1,8);
         return [
-            'task_id' => fake()->numberBetween(1,20),
-            'author_id' => fake()->randomDigit(),
+            'task_id' => $taskId,
+            'author_id' => $authorId,
             'body' => fake()->text(),
         ];
     }

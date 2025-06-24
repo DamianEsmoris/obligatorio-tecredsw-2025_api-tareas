@@ -13,6 +13,9 @@ return new class extends Migration
             $table->string('title');
             $table->text('description');
             $table->unsignedBigInteger('author_id');
+            $table->foreign('author_id')
+                ->references('id')
+                ->on('users');
             $table->timestamp('start_date')->nullable();
             $table->timestamp('due_date')->nullable();
             $table->timestamps();
