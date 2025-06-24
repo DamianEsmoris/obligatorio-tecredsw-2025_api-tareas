@@ -11,7 +11,7 @@ class CommentController extends Controller
     private function validateData(Array $data) {
         $validation = Validator::make($data, [
             'body' => 'required',
-            'author_id' => 'required|integer',
+            'author_id' => 'required|integer|exists:users,id',
             'task_id' => 'integer|exists:tasks,id'
         ]);
         $validationFailed = $validation->fails();

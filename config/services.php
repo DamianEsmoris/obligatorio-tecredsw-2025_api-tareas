@@ -36,6 +36,10 @@ return [
     ],
 
     'api_oauth' => [
+        'client_id' => env('API_OAUTH_CLIENT_ID'),
+        'client_secret' => env('API_OAUTH_CLIENT_SECRET'),
         'validate_url' => env('API_OAUTH_VALIDATE_URL'),
+        'login_url' => env('API_OAUTH_LOGIN_URL'),
+        'register_url' => env('API_OAUTH_REGISTER_URL')
     ]
 ];

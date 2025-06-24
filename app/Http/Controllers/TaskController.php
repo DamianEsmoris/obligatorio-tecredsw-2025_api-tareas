@@ -12,7 +12,7 @@ class TaskController extends Controller
         $validation = Validator::make($data, [
             'title' => 'required',
             'description' => '',
-            'author_id' => 'required|integer',
+            'author_id' => 'required|integer|exists:users,id',
             'start_date' => 'datetime',
             'due_date' => 'datetime',
             'categories' => 'nullable|array',
@@ -35,7 +35,7 @@ class TaskController extends Controller
         $task->due_date = $request->post('due_date');
         $task->save();
 
-        if (($categories = $request->post('categories') != null))
+        if (($categories = $request->post('categories')) != null)
             $task->categories()->sync($categories);
 
         return $task->load('categories');
@@ -63,7 +63,7 @@ class TaskController extends Controller
         $task->due_date = $request->post('due_date');
         $task->save();
 
-        if (($categories = $request->post('categories') != null))
+        if (($categories = $request->post('categories')) != null)
             $task->categories()->sync($categories);
 
         return $task->load('categories');
