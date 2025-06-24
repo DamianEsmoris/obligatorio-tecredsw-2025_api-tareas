@@ -12,17 +12,11 @@ class TaskController extends Controller
         $validation = Validator::make($data, [
             'title' => 'required',
             'description' => '',
-<<<<<<< Updated upstream
-            'author_id' => 'required|integer',
-            'start_date' => 'datetime',
-            'due_date' => 'datetime',
-=======
             'author_id' => 'required|integer|exists:users,id',
             'start_date' => 'date_format:Y-m-d H:i:s',
             'due_date' => 'date_format:Y-m-d H:i:s',
             'categories' => 'nullable|array',
             'categories.*' => 'integer|exists:categories,id'
->>>>>>> Stashed changes
         ]);
         $validationFailed = $validation->fails();
         return [$validationFailed, $validationFailed ? $validation->errors() : null];
@@ -41,15 +35,18 @@ class TaskController extends Controller
         $task->due_date = $request->post('due_date');
         $task->save();
 
-        return $task;
+        if (($categories = $request->post('categories')) != null)
+            $task->categories()->sync($categories);
+
+        return $task->load('categories');
     }
 
     public function GetAll(Request $request) {
-        return Task::get();
+        return Task::with('categories')->get();
     }
 
     public function Get(Request $request, int $id) {
-        return Task::findOrFail($id);
+        return Task::with('comments')->with('categories')->findOrFail($id);
     }
 
     public function Modify(Request $request, int $id) {
@@ -66,11 +63,16 @@ class TaskController extends Controller
         $task->due_date = $request->post('due_date');
         $task->save();
 
-        return $task;
+        if (($categories = $request->post('categories')) != null)
+            $task->categories()->sync($categories);
+
+        return $task->load('categories');
     }
 
     public function Delete(Request $request, int $id) {
-        Task::findOrFail($id)->delete();
+        $task = Task::findOrFail($id);
+        $task->categories()->detach();
+        $task->delete();
         return response()->json([
             'deleted' => true
         ]);

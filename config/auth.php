@@ -40,6 +40,10 @@ return [
             'driver' => 'session',
             'provider' => 'users',
         ],
+        'api_oauth' => [
+            'driver' => 'custom_oauth_driver',
+            'provider' => 'api_oauth'
+        ],
     ],
 
     /*
@@ -63,6 +67,10 @@ return [
         'users' => [
             'driver' => 'eloquent',
             'model' => env('AUTH_MODEL', App\Models\User::class),
+        ],
+
+        'api_oauth' => [
+            'driver' => 'api_oauth'
         ],
 
         // 'users' => [

@@ -8,16 +8,17 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('tasks', function (Blueprint $table) {
+        Schema::create('comments', function (Blueprint $table) {
             $table->id();
-            $table->string('title');
-            $table->text('description');
+            $table->text('body');
             $table->unsignedBigInteger('author_id');
             $table->foreign('author_id')
                 ->references('id')
                 ->on('users');
-            $table->timestamp('start_date')->nullable();
-            $table->timestamp('due_date')->nullable();
+            $table->unsignedBigInteger('task_id');
+            $table->foreign('task_id')
+                ->references('id')
+                ->on('tasks');
             $table->timestamps();
             $table->softDeletes();
         });
@@ -25,6 +26,6 @@ return new class extends Migration
 
     public function down(): void
     {
-        Schema::dropIfExists('tasks');
+        Schema::dropIfExists('comments');
     }
 };
