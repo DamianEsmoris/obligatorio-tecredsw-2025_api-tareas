@@ -35,4 +35,7 @@ return [
         ],
     ],
 
+    'api_oauth' => [
+        'validate_url' => env('API_OAUTH_VALIDATE_URL'),
+    ]
 ];
