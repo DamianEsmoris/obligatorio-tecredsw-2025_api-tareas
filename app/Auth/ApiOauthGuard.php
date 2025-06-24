@@ -2,6 +2,7 @@
 
 namespace App\Auth;
 
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Auth\GuardHelpers;
 use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Contracts\Auth\UserProvider;
@@ -21,8 +22,16 @@ class ApiOauthGuard implements Guard {
 
     public function user()
     {
-        if (is_null($this->user) && ($token = $this->request->bearerToken()) != null)
+        if (is_null($this->user)) {
+            $token = $this->request->bearerToken();
+            if (!$token)
+                return null;
             $this->user = $this->provider->retrieveByCredentials(['token' => $token]);
+            if (is_null($this->user))
+                return null;
+            return $this->user;
+        }
+
         return $this->user;
     }
 
@@ -31,6 +40,5 @@ class ApiOauthGuard implements Guard {
         if (!isset($credentials['token']))
             return false;
         return (bool) $this->provider->retrieveByCredentials($credentials);
-        return !is_null($this->user());
     }
 }
