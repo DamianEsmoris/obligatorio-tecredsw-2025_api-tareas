@@ -8,6 +8,8 @@ RUN echo "" > /etc/httpd/conf.d/welcome.conf && \
     echo "" > /etc/httpd/conf.d/userdir.conf && \
     echo "" > /etc/httpd/conf.d/autoindex.conf
 
+ARG PHP_FPM_URL
+
 RUN cat <<EOF > /etc/httpd/conf.d/default.conf
 DirectoryIndex index.php index.html
 ErrorLogFormat "[HTTPD_ERROR_LOG] [%{u}t] [%-m:%l] [pid %P:tid %T] %7F: %E: [client\ %a] %M% ,\ referer\ %{Referer}i"
@@ -29,7 +31,7 @@ CustomLog /dev/stdout combined
     CustomLog /dev/stdout combined
 
     <FilesMatch \.php$>
-        SetHandler "proxy:fcgi://php-fpm:9000"
+        SetHandler "proxy:fcgi://${PHP_FPM_URL}:9000"
     </FilesMatch>
 
     RewriteEngine On
