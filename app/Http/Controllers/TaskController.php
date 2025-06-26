@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Comment;
 use App\Models\Participates;
 use App\Models\Task;
 use Illuminate\Http\Request;
@@ -138,6 +139,7 @@ class TaskController extends Controller
         $task = Task::findOrFail($id);
         $task->categories()->detach();
         Participates::where('task_id', $id)->delete();
+        Comment::where('task_id', $id)->delete();
         $task->delete();
 
         Cache::tags('tasks')->flush();
