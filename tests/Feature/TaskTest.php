@@ -50,7 +50,7 @@ class TaskTest extends TestCase
 
     private function requestWithToken()
     {
-        $accessToken = $this->getAccessToken();
+        $this->accessToken = $this->getAccessToken();
         return $this->withHeaders([
             'Authorization' => 'Bearer ' . $this->getAccessToken(),
         ]);
@@ -62,6 +62,7 @@ class TaskTest extends TestCase
             'id',
             'title',
             'description',
+            'completeness',
             'author_id',
             'categories',
             'created_at',
@@ -74,6 +75,7 @@ class TaskTest extends TestCase
         return [
             'title' => '.',
             'description' => '.',
+            'completeness' => 1,
             'author_id' => 1,
         ];
     }
