@@ -12,9 +12,6 @@ return new class extends Migration
             $table->id();
             $table->text('body');
             $table->unsignedBigInteger('author_id');
-            $table->foreign('author_id')
-                ->references('id')
-                ->on('users');
             $table->unsignedBigInteger('task_id');
             $table->foreign('task_id')
                 ->references('id')
