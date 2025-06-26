@@ -39,28 +39,44 @@ class TaskController extends Controller
         if (($categories = $request->post('categories')) != null)
             $task->categories()->sync($categories);
 
+        Cache::tags('tasks')->flush();
+
         return $task->load('categories');
     }
 
     public function GetAll(Request $request) {
         $query = Task::query();
+        $cacheKey = 'tasks';
 
         if ($request->has('author_id') && is_numeric($request->input('author_id'))) {
             $authorId = $request->input('author_id');
             $query->where('author_id', $authorId);
+            $cacheKey .= '_author_id_' . $authorId;
         }
 
         if ($request->has('title')) {
             $searchTerm = $request->input('title');
             $query->whereRaw('LOWER(title) LIKE ?', ['%' . strtolower($searchTerm) . '%']);
+            $cacheKey .= '_title_' . $searchTerm;
         }
 
+        if (Cache::has($cacheKey))
+            return Cache::get($cacheKey);
+
         $result = $query->with('categories')->get();
+
+        Cache::tags('tasks')->put($cacheKey, $result, 180);
+
         return $result;
     }
 
     public function Get(Request $request, int $id) {
-        return Task::with('comments')->with('categories')->findOrFail($id);
+        $key = 'task_' . $id;
+        if (Cache::has($key))
+            return Cache::get($key);
+        $result = Task::with('comments')->with('categories')->findOrFail($id);
+        Cache::put($key, $result, 180);
+        return $result;
     }
 
     public function Modify(Request $request, int $id) {
@@ -80,6 +96,9 @@ class TaskController extends Controller
         if (($categories = $request->post('categories')) != null)
             $task->categories()->sync($categories);
 
+        Cache::tags('tasks')->flush();
+        Cache::forget('task_' . $id);
+
         return $task->load('categories');
     }
 
@@ -87,6 +106,9 @@ class TaskController extends Controller
         $task = Task::findOrFail($id);
         $task->categories()->detach();
         $task->delete();
+
+        Cache::tags('tasks')->flush();
+
         return response()->json([
             'deleted' => true
         ]);
