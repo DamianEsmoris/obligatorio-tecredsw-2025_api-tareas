@@ -12,6 +12,7 @@ class TaskFactory extends Factory
         return [
             'title' => fake()->sentence(),
             'description' => fake()->text(),
+            'completeness' => fake()->numberBetween(0,100),
             'author_id' => fake()->randomNumber(),
             'start_date' => $startDate,
             'due_date' => fake()->dateTimeBetween($startDate, '+30 years'),

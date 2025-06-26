@@ -15,6 +15,7 @@ class TaskController extends Controller
             'description' => '',
             'author_id' => 'required|integer',
             'start_date' => 'date_format:Y-m-d H:i:s',
+            'completeness' => 'integer|min:0|max:100',
             'due_date' => 'date_format:Y-m-d H:i:s',
             'categories' => 'nullable|array',
             'categories.*' => 'integer|exists:categories,id'
@@ -31,6 +32,7 @@ class TaskController extends Controller
         $task = new Task();
         $task->title = $request->post('title');
         $task->description = $request->post('description');
+        $task->completeness = $request->post('completeness') || null;
         $task->author_id = $request->post('author_id');
         $task->start_date = $request->post('start_date');
         $task->due_date = $request->post('due_date');
@@ -88,6 +90,7 @@ class TaskController extends Controller
 
         $task->title = $request->post('title');
         $task->description = $request->post('description');
+        $task->completeness = $request->post('completeness') || null;
         $task->author_id = $request->post('author_id');
         $task->start_date = $request->post('start_date');
         $task->due_date = $request->post('due_date');

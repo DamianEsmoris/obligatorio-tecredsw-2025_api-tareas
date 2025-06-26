@@ -12,6 +12,7 @@ return new class extends Migration
             $table->id();
             $table->string('title');
             $table->text('description');
+            $table->smallInteger('completeness')->default(0);
             $table->unsignedBigInteger('author_id');
             $table->timestamp('start_date')->nullable();
             $table->timestamp('due_date')->nullable();
