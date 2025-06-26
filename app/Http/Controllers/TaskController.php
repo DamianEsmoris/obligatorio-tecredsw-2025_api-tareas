@@ -73,6 +73,24 @@ class TaskController extends Controller
             $cacheKey .= '_title_' . $searchTerm;
         }
 
+        if ($request->has('completeness') && is_numeric($request->input('completeness'))) {
+            $authorId = $request->input('completeness');
+            $query->where('completeness', $authorId);
+            $cacheKey .= '_completenees_eq_' . $authorId;
+        }
+
+        if ($request->has('comp_min') && is_numeric($request->input('comp_min'))) {
+            $minimun = $request->input('comp_min');
+            $query->whereRaw('completeness >= ?', [$minimun]);
+            $cacheKey .= '_completenees_min_' . $minimun;
+        }
+
+        if ($request->has('comp_max') && is_numeric($request->input('comp_max'))) {
+            $maximum = $request->input('comp_max');
+            $query->whereRaw('completeness <= ?', [$maximum]);
+            $cacheKey .= '_completenees_max_' . $maximum;
+        }
+
         if (Cache::has($cacheKey))
             return Cache::get($cacheKey);
 
