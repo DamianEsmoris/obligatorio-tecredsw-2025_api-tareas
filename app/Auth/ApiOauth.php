@@ -4,6 +4,7 @@ namespace App\Auth;
 
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Auth\UserProvider;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
@@ -14,6 +15,9 @@ class ApiOauth implements UserProvider {
             return false;
 
         $accessToken = $credentials['token'];
+        if (Cache::has($accessToken))
+            return true;
+
         try {
             $response = Http::withHeaders([
                 'Authorization' => 'Bearer ' . $accessToken,
@@ -22,6 +26,7 @@ class ApiOauth implements UserProvider {
             ])->get(config('services.api_oauth.validate_url'));
 
             if ($response->successful() && !is_null($response->json('id'))) {
+                Cache::put($accessToken, true, 90);
                 return true;
             }
         } catch (\Exception $exception) {
