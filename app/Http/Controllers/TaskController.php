@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Task;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Validator;
 
 class TaskController extends Controller
@@ -42,7 +43,20 @@ class TaskController extends Controller
     }
 
     public function GetAll(Request $request) {
-        return Task::with('categories')->get();
+        $query = Task::query();
+
+        if ($request->has('author_id') && is_numeric($request->input('author_id'))) {
+            $authorId = $request->input('author_id');
+            $query->where('author_id', $authorId);
+        }
+
+        if ($request->has('title')) {
+            $searchTerm = $request->input('title');
+            $query->whereRaw('LOWER(title) LIKE ?', ['%' . strtolower($searchTerm) . '%']);
+        }
+
+        $result = $query->with('categories')->get();
+        return $result;
     }
 
     public function Get(Request $request, int $id) {
