@@ -2,7 +2,6 @@
 
 namespace App\Auth;
 
-use App\Models\User;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Auth\UserProvider;
 use Illuminate\Support\Facades\Http;
@@ -12,7 +11,7 @@ class ApiOauth implements UserProvider {
     public function retrieveByCredentials(array $credentials)
     {
         if (!isset($credentials['token']))
-            return null;
+            return false;
 
         $accessToken = $credentials['token'];
         try {
@@ -23,18 +22,12 @@ class ApiOauth implements UserProvider {
             ])->get(config('services.api_oauth.validate_url'));
 
             if ($response->successful() && !is_null($response->json('id'))) {
-                $userData = $response->json();
-                $userId = $userData['id'];
-                unset($userData['id']);
-                return User::updateOrCreate(
-                    [ 'id' => $userId ],
-                    $userData
-                );
+                return true;
             }
         } catch (\Exception $exception) {
             Log::error("External OAuth token valdidation failed: " . $exception->getMessage());
         }
-        return null;
+        return false;
     }
 
     public function retrieveById($id)
