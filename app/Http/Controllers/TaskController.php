@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Participates;
 use App\Models\Task;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
@@ -18,7 +19,9 @@ class TaskController extends Controller
             'completeness' => 'integer|min:0|max:100',
             'due_date' => 'date_format:Y-m-d H:i:s',
             'categories' => 'nullable|array',
-            'categories.*' => 'integer|exists:categories,id'
+            'categories.*' => 'integer|exists:categories,id',
+            'participants' => 'nullable|array',
+            'participants.*' => 'integer'
         ]);
         $validationFailed = $validation->fails();
         return [$validationFailed, $validationFailed ? $validation->errors() : null];
@@ -41,9 +44,16 @@ class TaskController extends Controller
         if (($categories = $request->post('categories')) != null)
             $task->categories()->sync($categories);
 
+        if (($participants = $request->post('participants')) != null)
+            $task->participants()->createMany(
+                array_map(fn (int $userId): array => [
+                    'user_id' => $userId
+                ], $participants
+            ));
+
         Cache::tags('tasks')->flush();
 
-        return $task->load('categories');
+        return $task->load('categories')->load('participants');
     }
 
     public function GetAll(Request $request) {
@@ -76,10 +86,15 @@ class TaskController extends Controller
         $key = 'task_' . $id;
         if (Cache::has($key))
             return Cache::get($key);
-        $result = Task::with('comments')->with('categories')->findOrFail($id);
+        $result = Task::with('comments')
+            ->with('categories')
+            ->with('participants')
+            ->findOrFail($id);
         Cache::put($key, $result, 180);
         return $result;
     }
+
+
 
     public function Modify(Request $request, int $id) {
         $task = Task::findOrFail($id);
@@ -99,6 +114,20 @@ class TaskController extends Controller
         if (($categories = $request->post('categories')) != null)
             $task->categories()->sync($categories);
 
+        if (($participants = $request->post('participants')) != null) {
+            $existingParticipants = $task->participants()->pluck('user_id')->toArray();
+
+            $toDelete = array_diff($existingParticipants, $participants);
+            $task->participants()->whereIn('user_id', $toDelete)->delete();
+
+            $toInsert = array_diff($participants, $existingParticipants);
+            $task->participants()->createMany(
+                array_map(fn (int $userId): array => [
+                    'user_id' => $userId
+                ], $toInsert
+            ));
+        }
+
         Cache::tags('tasks')->flush();
         Cache::forget('task_' . $id);
 
@@ -108,6 +137,7 @@ class TaskController extends Controller
     public function Delete(Request $request, int $id) {
         $task = Task::findOrFail($id);
         $task->categories()->detach();
+        Participates::where('task_id', $id)->delete();
         $task->delete();
 
         Cache::tags('tasks')->flush();
