@@ -3,8 +3,8 @@
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\TaskController;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
+use App\Http\Middleware\ApiOauthValidation;
 
 Route::get('/status', fn() => "OK");
 
@@ -18,7 +18,7 @@ Route::get('/comment', [CommentController::class, 'GetAll']);
 Route::get('/comment/{d}', [CommentController::class, 'Get']);
 
 
-Route::middleware('auth:api_oauth')->group(function() {
+Route::middleware(ApiOauthValidation::class)->group(function() {
     Route::post('/task', [TaskController::class, 'Create']);
     Route::put('/task/{d}', [TaskController::class, 'Modify']);
     Route::delete('/task/{d}', [TaskController::class, 'Delete']);

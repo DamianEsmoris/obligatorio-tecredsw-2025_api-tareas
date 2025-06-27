@@ -58,7 +58,7 @@ class CategoryTest extends TestCase
 
     private function requestWithToken()
     {
-        $accessToken = $this->getAccessToken();
+        $this->accessToken = $this->getAccessToken();
         return $this->withHeaders([
             'Authorization' => 'Bearer ' . $this->getAccessToken(),
         ]);

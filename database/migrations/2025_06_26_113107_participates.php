@@ -8,21 +8,21 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('comments', function (Blueprint $table) {
+        Schema::create('participate', function (Blueprint $table) {
             $table->id();
-            $table->text('body');
-            $table->unsignedBigInteger('author_id');
             $table->unsignedBigInteger('task_id');
             $table->foreign('task_id')
                 ->references('id')
                 ->on('tasks');
-            $table->timestamps();
+            $table->unsignedBigInteger('user_id');
+            $table->unique(['task_id', 'user_id']);
             $table->softDeletes();
+            $table->timestamps();
         });
     }
 
     public function down(): void
     {
-        Schema::dropIfExists('comments');
+        Schema::dropIfExists('participate');
     }
 };

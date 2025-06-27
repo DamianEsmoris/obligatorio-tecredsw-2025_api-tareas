@@ -50,7 +50,7 @@ class TaskTest extends TestCase
 
     private function requestWithToken()
     {
-        $accessToken = $this->getAccessToken();
+        $this->accessToken = $this->getAccessToken();
         return $this->withHeaders([
             'Authorization' => 'Bearer ' . $this->getAccessToken(),
         ]);
@@ -62,6 +62,7 @@ class TaskTest extends TestCase
             'id',
             'title',
             'description',
+            'completeness',
             'author_id',
             'categories',
             'created_at',
@@ -74,6 +75,7 @@ class TaskTest extends TestCase
         return [
             'title' => '.',
             'description' => '.',
+            'completeness' => 1,
             'author_id' => 1,
         ];
     }
@@ -95,6 +97,7 @@ class TaskTest extends TestCase
         $response->assertStatus(200);
         $taskResponseStructure = $this->getTaskStructureWithCategories();
         array_push($taskResponseStructure, 'comments');
+        array_push($taskResponseStructure, 'participants');
         $response->assertJsonStructure($taskResponseStructure);
     }
 
@@ -156,7 +159,34 @@ class TaskTest extends TestCase
         }
     }
 
-    // PUTL: /api/task/{id}
+    public function test_createWithCategoriesAndParticipantsTaskAuth(): void
+    {
+        $taskData = $this->getExampleTask();
+        $taskData['categories'] = [1, 2, 3];
+        $taskData['participants'] = [7, 5, 3];
+
+        $response = $this->requestWithToken()->postJson('/api/task', $taskData);
+
+        $response->assertStatus(201);
+        $response->assertJsonStructure($this->getTaskStructureWithCategories());
+
+        $data = $response->json();
+        $this->assertDatabaseHas('tasks', ['id' => $data['id']]);
+
+        foreach ($taskData['categories'] as $categoryId)
+            $this->assertDatabaseHas('have_assigned', [
+                'task_id' => $data['id'],
+                'category_id' => $categoryId,
+            ]);
+
+        foreach ($taskData['participants'] as $participantId)
+            $this->assertDatabaseHas('participate', [
+                'task_id' => $data['id'],
+                'user_id' => $participantId,
+            ]);
+    }
+
+    // PUT: /api/task/{id}
 
     public function test_updateExistentTaskNoAuth(): void
     {
@@ -196,6 +226,30 @@ class TaskTest extends TestCase
             $this->assertDatabaseHas('have_assigned', [
                 'task_id' => 1,
                 'category_id' => $categoryId,
+                'deleted_at' => null
+            ]);
+    }
+
+    public function test_updateExistentTaskChangingCategoriesAndParticipantsAuth(): void
+    {
+        $taskData = $this->getExampleTask();
+        $taskData['categories'] = [2, 4];
+        $taskData['participants'] = [32, 64];
+        $response = $this->requestWithToken()->putJson('/api/task/1', $taskData);
+        $response->assertStatus(200);
+        $response->assertJsonStructure($this->getTaskStructureWithCategories());
+        $this->assertDatabaseHas('tasks', ['id' => 1, 'title' => $taskData['title']]);
+        foreach ($taskData['categories'] as $categoryId)
+            $this->assertDatabaseHas('have_assigned', [
+                'task_id' => 1,
+                'category_id' => $categoryId,
+                'deleted_at' => null
+            ]);
+
+        foreach ($taskData['participants'] as $participantId)
+            $this->assertDatabaseHas('participate', [
+                'task_id' => 1,
+                'user_id' => $participantId,
                 'deleted_at' => null
             ]);
     }

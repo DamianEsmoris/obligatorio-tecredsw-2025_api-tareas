@@ -54,6 +54,11 @@ services:
     volumes:
       - ./public:/var/www/html/public
 
+  tareas_redis:
+    image: redis
+    networks:
+      - api-tareas
+
 networks:
   api-tareas:
     driver: bridge
