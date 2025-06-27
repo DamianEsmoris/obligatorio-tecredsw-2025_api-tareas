@@ -7,8 +7,10 @@ use App\Models\Participates;
 use App\Models\Task;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Validator;
+use PhpParser\Node\Stmt\Catch_;
 
 class TaskController extends Controller
 {
@@ -41,32 +43,41 @@ class TaskController extends Controller
         $task->author_id = $request->post('author_id');
         $task->start_date = $request->post('start_date');
         $task->due_date = $request->post('due_date');
-        $task->save();
+        try {
+            DB::beginTransaction();
+            $task->save();
 
-        if (($categories = $request->post('categories')) != null)
-            $task->categories()->sync($categories);
+            if (($categories = $request->post('categories')) != null)
+                $task->categories()->sync($categories);
 
-        if (($participants = $request->post('participants')) != null)
-            $task->participants()->createMany(
-                array_map(fn (int $userId): array => [
-                    'user_id' => $userId
-                ], $participants
-            ));
+            if (($participants = $request->post('participants')) != null)
+                $task->participants()->createMany(
+                    array_map(fn (int $userId): array => [
+                        'user_id' => $userId
+                    ], $participants
+                ));
 
-        Cache::tags('tasks')->flush();
+            $taskData = $task->toArray();
+            $taskData['task_id'] = $taskData['id'];
+            unset($taskData['id']);
 
-        $taskData = $task->toArray();
-        $taskData['task_id'] = $taskData['id'];
-        unset($taskData['id']);
+            Http::withHeaders([
+                'Content-Type' => 'application/json',
+                'Accept' => 'application/json',
+            ])->post(config('services.api_history.task_url'),
+                $taskData
+            );
 
-        $response = Http::withHeaders([
-            'Content-Type' => 'application/json',
-            'Accept' => 'application/json',
-        ])->post(config('services.api_history.task_url'),
-            $taskData
-        );
+            DB::commit();
+            Cache::tags('tasks')->flush();
 
-        return $task->load('categories')->load('participants');
+            return $task->load('categories')->load('participants');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'message' => 'Task deletion failed',
+            ], 500);
+        }
     }
 
     public function GetAll(Request $request) {
@@ -146,42 +157,61 @@ class TaskController extends Controller
         $task->author_id = $request->post('author_id');
         $task->start_date = $request->post('start_date');
         $task->due_date = $request->post('due_date');
-        $task->save();
 
-        if (($categories = $request->post('categories')) != null)
-            $task->categories()->sync($categories);
+         DB::beginTransaction();
 
-        if (($participants = $request->post('participants')) != null) {
-            $existingParticipants = $task->participants()->pluck('user_id')->toArray();
+        try {
+            $task->save();
 
-            $toDelete = array_diff($existingParticipants, $participants);
-            $task->participants()->whereIn('user_id', $toDelete)->delete();
+            if (($categories = $request->post('categories')) != null)
+                $task->categories()->sync($categories);
 
-            $toInsert = array_diff($participants, $existingParticipants);
-            $task->participants()->createMany(
-                array_map(fn (int $userId): array => [
-                    'user_id' => $userId
-                ], $toInsert
-            ));
+            if (($participants = $request->post('participants')) != null) {
+                $existingParticipants = $task->participants()->pluck('user_id')->toArray();
+
+                $toDelete = array_diff($existingParticipants, $participants);
+                $task->participants()->whereIn('user_id', $toDelete)->delete();
+
+                $toInsert = array_diff($participants, $existingParticipants);
+                $task->participants()->createMany(
+                    array_map(fn (int $userId): array => [
+                        'user_id' => $userId
+                    ], $toInsert
+                ));
+            }
+
+            DB::commit();
+            Cache::tags('tasks')->flush();
+            Cache::forget('task_' . $id);
+            return $task->load('categories');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'message' => 'Task modification failed',
+            ], 500);
         }
-
-        Cache::tags('tasks')->flush();
-        Cache::forget('task_' . $id);
-
-        return $task->load('categories');
     }
 
     public function Delete(Request $request, int $id) {
         $task = Task::findOrFail($id);
-        $task->categories()->detach();
-        Participates::where('task_id', $id)->delete();
-        Comment::where('task_id', $id)->delete();
-        $task->delete();
+        try {
+            DB::beginTransaction();
+            $task->categories()->detach();
+            Participates::where('task_id', $id)->delete();
+            Comment::where('task_id', $id)->delete();
+            $task->delete();
 
-        Cache::tags('tasks')->flush();
+            DB::commit();
+            Cache::tags('tasks')->flush();
 
-        return response()->json([
-            'deleted' => true
-        ]);
+            return response()->json([
+                'deleted' => true
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'message' => 'Task deletion failed',
+            ], 500);
+        }
     }
 }
