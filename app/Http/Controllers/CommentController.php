@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Comment;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Validator;
 
 class CommentController extends Controller
@@ -29,6 +30,7 @@ class CommentController extends Controller
         $comment->author_id = $request->post('author_id');
         $comment->save();
 
+        Cache::forget('task_' . $comment->task_id);
         return $comment;
     }
 
@@ -51,12 +53,14 @@ class CommentController extends Controller
         $comment->author_id = $request->post('author_id');
         $comment->save();
 
+        Cache::forget('task_' . $comment->task_id);
         return $comment;
     }
 
     public function Delete(Request $request, int $id) {
         $comment = Comment::findOrFail($id);
         $comment->delete();
+        Cache::forget('task_' . $comment->task_id);
         return response()->json([
             'deleted' => true
         ]);
