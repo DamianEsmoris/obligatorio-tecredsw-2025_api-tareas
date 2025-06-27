@@ -127,7 +127,7 @@ class TaskController extends Controller
             ->with('categories')
             ->with('participants')
             ->findOrFail($id);
-        Cache::put($key, $result, 180);
+        Cache::tags('tasks')->put($key, $result, 180);
         return $result;
     }
 
