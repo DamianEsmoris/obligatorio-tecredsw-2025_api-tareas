@@ -14,7 +14,7 @@ services:
       start_period: 10s
       timeout: 3s
     networks:
-      - api-tareas
+      - intranet
 
   tareas_db.configurator:
     image: mcr.microsoft.com/mssql/server:2019-latest
@@ -29,7 +29,7 @@ services:
       /opt/mssql-tools18/bin/sqlcmd -S tareas_db -U sa -P $${SA_PASSWORD} -C -Q "IF NOT EXISTS (SELECT * FROM sys.databases WHERE name = \"$${DB_NAME}\") BEGIN CREATE DATABASE $${DB_NAME} END " || exit
       '
     networks:
-      - api-tareas
+      - intranet
 
   tareas_php-fpm:
     build: docker/php-fpm
@@ -38,7 +38,7 @@ services:
             condition: service_completed_successfully
     networks:
       - api-oauth_intranet
-      - api-tareas
+      - intranet
     volumes:
       - ./:/var/www/html
 
@@ -50,17 +50,17 @@ services:
     ports:
       - "8000:80"
     networks:
-      - api-tareas
+      - intranet
     volumes:
       - ./public:/var/www/html/public
 
   tareas_redis:
     image: redis
     networks:
-      - api-tareas
+      - intranet
 
 networks:
-  api-tareas:
+  intranet:
     driver: bridge
   api-oauth_intranet:
     external: true
