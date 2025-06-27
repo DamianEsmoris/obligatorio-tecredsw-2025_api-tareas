@@ -36,7 +36,7 @@ class TaskController extends Controller
         $task = new Task();
         $task->title = $request->post('title');
         $task->description = $request->post('description');
-        $task->completeness = $request->post('completeness') || null;
+        $task->completeness = $request->post('completeness') ?? null;
         $task->author_id = $request->post('author_id');
         $task->start_date = $request->post('start_date');
         $task->due_date = $request->post('due_date');
@@ -130,7 +130,7 @@ class TaskController extends Controller
 
         $task->title = $request->post('title');
         $task->description = $request->post('description');
-        $task->completeness = $request->post('completeness') || null;
+        $task->completeness = $request->post('completeness') ?? null;
         $task->author_id = $request->post('author_id');
         $task->start_date = $request->post('start_date');
         $task->due_date = $request->post('due_date');
