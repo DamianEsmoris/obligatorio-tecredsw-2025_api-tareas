@@ -91,13 +91,19 @@ class TaskController extends Controller
             $cacheKey .= '_completenees_max_' . $maximum;
         }
 
+    if ($request->has('participant_id') && is_numeric($request->input('participant_id'))) {
+        $participantUserId = intval($request->input('participant_id'));
+        $query->whereHas('participants', fn ($query) =>
+            $query->where('user_id', $participantUserId)
+        );
+        $cacheKey .= '_participant_id_' . $participantUserId;
+    }
+
         if (Cache::has($cacheKey))
             return Cache::get($cacheKey);
 
         $result = $query->with('categories')->get();
-
         Cache::tags('tasks')->put($cacheKey, $result, 180);
-
         return $result;
     }
 
