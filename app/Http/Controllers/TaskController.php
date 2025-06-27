@@ -7,6 +7,7 @@ use App\Models\Participates;
 use App\Models\Task;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Validator;
 
 class TaskController extends Controller
@@ -53,6 +54,17 @@ class TaskController extends Controller
             ));
 
         Cache::tags('tasks')->flush();
+
+        $taskData = $task->toArray();
+        $taskData['task_id'] = $taskData['id'];
+        unset($taskData['id']);
+
+        $response = Http::withHeaders([
+            'Content-Type' => 'application/json',
+            'Accept' => 'application/json',
+        ])->post(config('services.api_history.task_url'),
+            $taskData
+        );
 
         return $task->load('categories')->load('participants');
     }
