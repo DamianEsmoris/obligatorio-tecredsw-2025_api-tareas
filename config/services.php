@@ -41,5 +41,10 @@ return [
         'validate_url' => env('API_OAUTH_VALIDATE_URL'),
         'login_url' => env('API_OAUTH_LOGIN_URL'),
         'register_url' => env('API_OAUTH_REGISTER_URL')
+    ],
+
+    'api_history' => [
+        'url' => env('API_HISTORY_URL'),
+        'task_url' => env('API_HISTORY_TASK_URL'),
     ]
 ];
