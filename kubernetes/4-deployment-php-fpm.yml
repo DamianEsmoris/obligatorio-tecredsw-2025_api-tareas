@@ -1,0 +1,63 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: php-fpm
+  namespace: api-tareas-obligatorio-tecredsw
+spec:
+  selector:
+    matchLabels:
+      app: php-fpm
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: php-fpm
+    spec:
+      containers:
+        - name: php-fpm
+          image: desmoris/php-fpm-oauth-obligatorio-tecredsw-2025
+          ports:
+            - containerPort: 9000
+          env:
+            - name: SKIP_SEEDERS
+              value: "true"
+            - name: REPO_URL
+              value: "https://github.com/DamianEsmoris/obligatorio-tecredsw-2025_api-tareas"
+            - name: DB_CONNECTION
+              value: "sqlsrv"
+            - name: DB_HOST
+              value: "db"
+            - name: DB_PORT
+              value: "1433"
+            - name: DB_DATABASE
+              value: "laravel"
+            - name: DB_USERNAME
+              value: "sa"
+            - name: DB_TRUST_SERVER_CERTIFICATE
+              value: "true"
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: sqlsrv
+                  key: password
+						- name: CACHE_STORE
+							value: redis
+						- name: REDIS_CLIENT
+							value: predis
+						- name: REDIS_HOST
+							value: redis
+						- name: API_OAUTH_VALIDATE_URL
+							value: apache.api-oauth-obligatorio-tecredsw.svc.cluster.local/api/validate
+						- name: API_OAUTH_CLIENT_ID
+							value: 2
+						- name: API_OAUTH_SECRET
+							value: cIlqHfeVwaCVr8kNqPNF8PnKzgCKQxCliIRLvnYh
+						- name: API_OAUTH_LOGIN_URL
+							value: apache.api-oauth-obligatorio-tecredsw.svc.cluster.local/oauth/token
+						- name: API_OAUTH_REGISTER_URL
+							value: apache.api-oauth-obligatorio-tecredsw.svc.cluster.local/api/user
+						- name: API_HISTORY_URL
+							value: apache.api-historial-obligatorio-tecredsw.svc.cluster.local
+						- name: API_HISTORY_TASK_URL
+							value: apache.api-historial-obligatorio-tecredsw.svc.cluster.local/task
+

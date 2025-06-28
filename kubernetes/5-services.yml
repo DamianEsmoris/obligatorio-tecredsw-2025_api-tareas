@@ -1,0 +1,40 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: db
+  namespace: api-oauth-obligatorio-tecredsw
+spec:
+  selector:
+    app: db
+  ports:
+    - protocol: TCP
+      port: 1433
+      targetPort: 1433
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: php-fpm
+  namespace: api-oauth-obligatorio-tecredsw
+spec:
+  selector:
+    app: php-fpm
+  ports:
+    - protocol: TCP
+      port: 9000
+      targetPort: 9000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: apache
+  namespace: api-oauth-obligatorio-tecredsw
+spec:
+  selector:
+    app: apache
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+      nodePort: 30000
+  type: NodePort

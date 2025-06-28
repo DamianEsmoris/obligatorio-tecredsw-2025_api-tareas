@@ -1,0 +1,61 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: db-pvc
+  namespace: api-oauth-obligatorio-tecredsw
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 3Gi
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: db
+  namespace: api-oauth-obligatorio-tecredsw
+spec:
+  selector:
+    matchLabels:
+      app: db
+  replicas: 1
+  serviceName: db
+  template:
+    metadata:
+      labels:
+        app: db
+    spec:
+      containers:
+        - name: sqlsrv
+          image: mcr.microsoft.com/mssql/server:2022-latest
+          securityContext:
+            runAsUser: 0
+          ports:
+            - containerPort: 1433
+          env:
+            - name: ACCEPT_EULA
+              value: "Y"
+            - name: SA_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: sqlsrv
+                  key: password
+            - name: TZ
+              value: "America/Montevideo"
+          volumeMounts:
+            - mountPath: /var/opt/mssql
+              name: db
+          readinessProbe:
+            tcpSocket:
+              port: 1433
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 5
+            successThreshold: 1
+            failureThreshold: 3
+
+      volumes:
+        - name: db
+          persistentVolumeClaim:
+            claimName: db-pvc

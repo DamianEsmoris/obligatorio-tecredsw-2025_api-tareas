@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: apache
+  namespace: api-tareas-obligatorio-tecredsw
+spec:
+  selector:
+    matchLabels:
+      app: apache
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: apache
+    spec:
+      containers:
+        - name: apache
+          image: desmoris/apache-api-obligatorio-tecredsw-2025
+          ports:
+            - containerPort: 80
+          env:
+            - name: PHP_FPM_URL
+              value: "php-fpm"
+            - name: REPO_URL
+              value: "https://github.com/DamianEsmoris/obligatorio-tecredsw-2025_api-tareas"
