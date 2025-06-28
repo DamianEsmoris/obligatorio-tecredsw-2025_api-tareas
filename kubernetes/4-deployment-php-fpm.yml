@@ -61,6 +61,6 @@ spec:
             - name: API_OAUTH_REGISTER_URL
               value: "apache.api-oauth-obligatorio-tecredsw.svc.cluster.local/api/user"
             - name: API_HISTORY_URL
-              value: "apache.api-historial-obligatorio-tecredsw.svc.cluster.local"
+              value: "apache.api-historial-obligatorio-tecredsw.svc.cluster.local/api"
             - name: API_HISTORY_TASK_URL
-              value: "apache.api-historial-obligatorio-tecredsw.svc.cluster.local/task"
+              value: "apache.api-historial-obligatorio-tecredsw.svc.cluster.local/api/task"
