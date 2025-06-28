@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: php-fpm
-          image: desmoris/php-fpm-oauth-obligatorio-tecredsw-2025
+          image: desmoris/php-fpm-obligatorio-tecredsw-2025
           ports:
             - containerPort: 9000
           env:
@@ -40,6 +40,7 @@ spec:
                 secretKeyRef:
                   name: sqlsrv
                   key: password
+<<<<<<< HEAD
 						- name: CACHE_STORE
 							value: redis
 						- name: REDIS_CLIENT
@@ -60,4 +61,27 @@ spec:
 							value: apache.api-historial-obligatorio-tecredsw.svc.cluster.local
 						- name: API_HISTORY_TASK_URL
 							value: apache.api-historial-obligatorio-tecredsw.svc.cluster.local/task
-
+            - name: CACHE_STORE
+              value: "redis"
+            - name: REDIS_CLIENT
+              value: "predis"
+            - name: REDIS_HOST
+              value: "redis"
+            - name: REDIS_PORT
+              value: "6379"
+            - name: REDIS_PASSWORD
+              value: null
+            - name: API_OAUTH_VALIDATE_URL
+              value: "apache.api-oauth-obligatorio-tecredsw.svc.cluster.local/api/validate"
+            - name: API_OAUTH_CLIENT_ID
+              value: "1"
+            - name: API_OAUTH_SECRET
+              value: "O5oZHin7Sz5l1Plm1UlXdAP4Qr5fYtw0jnZvKAn1"
+            - name: API_OAUTH_LOGIN_URL
+              value: "apache.api-oauth-obligatorio-tecredsw.svc.cluster.local/oauth/token"
+            - name: API_OAUTH_REGISTER_URL
+              value: "apache.api-oauth-obligatorio-tecredsw.svc.cluster.local/api/user"
+            - name: API_HISTORY_URL
+              value: "apache.api-historial-obligatorio-tecredsw.svc.cluster.local"
+            - name: API_HISTORY_TASK_URL
+              value: "apache.api-historial-obligatorio-tecredsw.svc.cluster.local/task"

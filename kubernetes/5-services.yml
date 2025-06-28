@@ -2,7 +2,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: db
-  namespace: api-oauth-obligatorio-tecredsw
+  namespace: api-tareas-obligatorio-tecredsw
 spec:
   selector:
     app: db
@@ -14,8 +14,21 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
+  name: redis
+  namespace: api-tareas-obligatorio-tecredsw
+spec:
+  selector:
+    app: redis
+  ports:
+    - protocol: TCP
+      port: 6379
+      targetPort: 6379
+---
+apiVersion: v1
+kind: Service
+metadata:
   name: php-fpm
-  namespace: api-oauth-obligatorio-tecredsw
+  namespace: api-tareas-obligatorio-tecredsw
 spec:
   selector:
     app: php-fpm
@@ -28,7 +41,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: apache
-  namespace: api-oauth-obligatorio-tecredsw
+  namespace: api-tareas-obligatorio-tecredsw
 spec:
   selector:
     app: apache
@@ -36,5 +49,5 @@ spec:
     - protocol: TCP
       port: 80
       targetPort: 80
-      nodePort: 30000
+      nodePort: 30001
   type: NodePort
