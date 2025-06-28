@@ -40,7 +40,6 @@ spec:
                 secretKeyRef:
                   name: sqlsrv
                   key: password
-<<<<<<< HEAD
 						- name: CACHE_STORE
 							value: redis
 						- name: REDIS_CLIENT
