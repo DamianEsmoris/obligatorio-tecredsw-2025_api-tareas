@@ -41,26 +41,6 @@ spec:
                   name: sqlsrv
                   key: password
             - name: CACHE_STORE
-              value: redis
-            - name: REDIS_CLIENT
-              value: predis
-            - name: REDIS_HOST
-              value: redis
-            - name: API_OAUTH_VALIDATE_URL
-              value: apache.api-oauth-obligatorio-tecredsw.svc.cluster.local/api/validate
-            - name: API_OAUTH_CLIENT_ID
-              value: 2
-            - name: API_OAUTH_SECRET
-              value: cIlqHfeVwaCVr8kNqPNF8PnKzgCKQxCliIRLvnYh
-            - name: API_OAUTH_LOGIN_URL
-              value: apache.api-oauth-obligatorio-tecredsw.svc.cluster.local/oauth/token
-            - name: API_OAUTH_REGISTER_URL
-              value: apache.api-oauth-obligatorio-tecredsw.svc.cluster.local/api/user
-            - name: API_HISTORY_URL
-              value: apache.api-historial-obligatorio-tecredsw.svc.cluster.local
-            - name: API_HISTORY_TASK_URL
-              value: apache.api-historial-obligatorio-tecredsw.svc.cluster.local/task
-            - name: CACHE_STORE
               value: "redis"
             - name: REDIS_CLIENT
               value: "predis"
