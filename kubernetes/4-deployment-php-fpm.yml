@@ -69,7 +69,7 @@ spec:
             - name: REDIS_PORT
               value: "6379"
             - name: REDIS_PASSWORD
-              value: null
+              value: "null"
             - name: API_OAUTH_VALIDATE_URL
               value: "apache.api-oauth-obligatorio-tecredsw.svc.cluster.local/api/validate"
             - name: API_OAUTH_CLIENT_ID
