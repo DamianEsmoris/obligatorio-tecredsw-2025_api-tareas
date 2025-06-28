@@ -17,7 +17,7 @@ if [ -z "${SKIP_CONFIG_CACHE_DELETION}" ]; then
 fi
 
 [ -z "${SKIP_MIGRATIONS}" ] \
-    && php artisan migrate
+    && php artisan migrate --force
 
 [ -z "${SKIP_SEEDERS}" ] \
     && php artisan db:seed

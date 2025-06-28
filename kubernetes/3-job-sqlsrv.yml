@@ -1,0 +1,30 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: init-db
+  namespace: api-tareas-obligatorio-tecredsw
+spec:
+  template:
+    spec:
+      restartPolicy: OnFailure
+      containers:
+        - name: init-db
+          image: mcr.microsoft.com/mssql/server:2022-latest
+          env:
+            - name: SA_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: sqlsrv
+                  key: password
+            - name: DB_NAME
+              value: laravel
+            - name: DB_HOST
+              value: "db"
+          command:
+            - bash
+            - -c
+            - |
+              until /opt/mssql-tools18/bin/sqlcmd -S $DB_HOST -U sa -P $SA_PASSWORD -C -Q "SELECT 1" >/dev/null 2>&1; do sleep 5; done
+
+              /opt/mssql-tools18/bin/sqlcmd -S $DB_HOST -U sa -P $SA_PASSWORD -C -Q \
+              "IF NOT EXISTS (SELECT * FROM sys.databases WHERE name = '$DB_NAME') BEGIN CREATE DATABASE [$DB_NAME] END"
