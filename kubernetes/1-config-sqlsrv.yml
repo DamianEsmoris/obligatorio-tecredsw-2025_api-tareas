@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: db-pvc
+  namespace: api-tareas-obligatorio-tecredsw
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 3Gi
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: sqlsrv
+  namespace: api-tareas-obligatorio-tecredsw
+type: Opaque
+data:
+  password: UDRzc3cwcmQhIQ==
+
